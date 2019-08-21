@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        tbody td {
+            width: 20px;
+            height: 20px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <input id="horizontal" type="number" placeholder="horizontal">
+    <input id="vertical" type="number" placeholder="vertical">
+    <input id="mine" type="number" placeholder="mine">
+    <button id="execute">execute</button>
+    <table id="table">
+        <thead>
+            <tr>
+                <td><span id="timer">0</span>초</td>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script src="minesweeper.js"></script>
+</body>
+</html>
