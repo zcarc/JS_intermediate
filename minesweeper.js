@@ -128,11 +128,10 @@ document.querySelector('#execute').addEventListener('click', function(){
 });
 
 
-
-// 마우스 오른쪽 클릭 이벤트
-// contextmenu 이벤트
-// tbody.querySelectorAll('td').forEach(function (item){
-//     item.addEventListener('contextmenu', function(){
-//         console.log('오른쪽 클릭');
-//     })
-// })
+// addEventListener 를 단 대상과 실제로 eventListener가 발생하는 그 Target은 다를 수 있다.
+// eventListener를 단 대상이 currentTarget이고 이벤트가 실제로 발생하는 얘가 target이다.
+tbody.addEventListener('contextmenu', function(e){
+    console.log('e.currentTarget: ', e.currentTarget);
+    console.log('e.target: ', e.target);
+    
+})
