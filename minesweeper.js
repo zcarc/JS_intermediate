@@ -108,6 +108,45 @@ document.querySelector('#execute').addEventListener('click', function(){
             }) // td 오른쪽 클릭 시
             //////////////////////////////////////////////////
 
+            // td 왼쪽 클릭 시
+            td.addEventListener('click', function(e) {
+
+                var parentTr = e.currentTarget.parentNode;
+                var parentTbody = parentTr.parentNode;
+
+                var elementTd = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
+                var elementTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+
+                if(dataset[elementTr][elementTd] === 'X') {
+                    e.currentTarget.textContent = '펑';
+
+                } else {
+
+                    var around = [
+                        dataset[elementTr][elementTd - 1], dataset[elementTr][elementTd + 1],
+                    ];
+
+                    // 선택된 칸의 윗칸이 있을 때
+                    if(dataset[elementTr - 1]) {
+                        around = around.concat(dataset[elementTr - 1][elementTd - 1], dataset[elementTr - 1][elementTd], dataset[elementTr - 1][elementTd + 1]);
+
+                    } 
+
+                    // 선택된 칸의 아래칸이 있을 때
+                    if(dataset[elementTr + 1]) {
+                        around = around.concat(dataset[elementTr + 1][elementTd - 1], dataset[elementTr + 1][elementTd], dataset[elementTr + 1][elementTd + 1]);
+
+                    }
+
+                    // 필터는 return 조건이 true일 때 해당 요소 자체를 리턴한다.
+                     e.currentTarget.textContent = around.filter(function(e){
+                        return e === 'X';
+
+                    }).length;
+                }
+
+            });
+
 
             td.textContent = '';
             tr.appendChild(td);
