@@ -218,3 +218,15 @@ tbody.addEventListener('contextmenu', function(e){
     console.log('e.target: ', e.target);
     
 })
+
+
+// 8-7. 스코프
+// var x = 'global';
+
+// function ex(){
+//     var x = 'local';
+//     x = 'change';
+// }
+
+// ex();
+// console.log(x);
