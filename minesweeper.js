@@ -230,3 +230,24 @@ tbody.addEventListener('contextmenu', function(e){
 
 // ex();
 // console.log(x);
+
+
+// 8-8. 스코프 체인 : 스코프 간의 상하관계를 스코프 체인이라고 부른다.
+var name = 'zero';
+function outer() {
+    console.log('외부', name); // 외부 zero
+    function inner() {
+        var enemy = 'nero';
+        console.log('내부', name);
+    }
+    inner();
+}
+// inner() 함수 내부에 name이 없으면
+// 바깥으로 나가서 outer에서 찾는다.
+// outer에서도 없으면 outer 바깥의 전체범위에서 찾는다.
+
+outer();
+
+// enemy는 inner() 함수 내부에는 있지만 
+// 전체범위 내에서 함수 내에 있는 변수에는 접근할 수 없다.
+// console.log(enemy);
