@@ -251,3 +251,19 @@ outer();
 // enemy는 inner() 함수 내부에는 있지만 
 // 전체범위 내에서 함수 내에 있는 변수에는 접근할 수 없다.
 // console.log(enemy);
+
+
+// 8-9. 렉시컬 스코프 : 정적 범위 변수나 함수가 정의된 뒤로 그 변수나 함수의 범위는 정적이고 변하지 않는다.
+// 동적 스코프인 경우는 최근에 할당 받은 변수를 호출하지만 정적 스코프는 그렇지 않다.
+var name = 'zero';
+
+function log() {
+    console.log(name);
+}
+
+function wrapper() {
+    var name = '비밀번호(바보)';
+    log();
+}
+
+wrapper();
