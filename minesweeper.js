@@ -26,6 +26,7 @@ document.querySelector('#execute').addEventListener('click', function(){
 
         for(var j  = 0; j < vertical; j += 1) {
 
+
             var td = document.createElement('td');
 
             //////////////////////////////////////////////////
@@ -125,10 +126,16 @@ document.querySelector('#execute').addEventListener('click', function(){
                 // 원래는 테이블 색이 black 이지만 특정 td를 선택했을 때 Background Color를 white로 변경
                 e.currentTarget.classList.add('opened');
 
+
                 if(dataset[elementTr][elementTd] === 'X') {
+
                     e.currentTarget.textContent = '펑';
 
                 } else {
+
+                    // 재귀함수 시 열었던 부분을 다시 여는 부분이 있기 때문에 성능저하 문제가 있다.
+                    // 원래는 0이었다가 click 했을 때 1로 바꿈
+                    dataset[elementTr][elementTd] = 1;
 
                     var around = [
                         dataset[elementTr][elementTd - 1], dataset[elementTr][elementTd + 1],
@@ -184,12 +191,35 @@ document.querySelector('#execute').addEventListener('click', function(){
                             ]);
                         }
 
+                        
+
                         // 배열에서 "undefined, null, 0, 빈문자열" 의 값들이 있는 데이터를 삭제하는 함수이다.
                         // 여기서는 element 한개를 가져오니 있다는 자체가 true이다. element가 없을 경우는 undefined 이다.
-                        aroundBlanks.filter( function(v) { console.log('v: ', v); return !!v } ).forEach(function(sideBlank){
+                        aroundBlanks.filter( function(v) { 
+                            console.log('v: ', v); 
+                            return !!v;
 
-                            // 여기서 click() 함수는 addEventListener의 click을 직접하는 것과 같다. (재귀함수)
-                            sideBlank.click();
+                        } ).forEach(function(sideBlank) {
+
+                            var parentTr = sideBlank.parentNode;
+                            var parentTbody = sideBlank.parentNode.parentNode;
+                            var sideBlankTd = Array.prototype.indexOf.call(parentTr.children, sideBlank);
+                            var sideBlankTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+
+                            if(dataset[sideBlankTr][sideBlankTd] !== 1){
+
+                                console.log('클릭될 칸: ', sideBlank);
+
+                                // 여기서 click() 함수는 addEventListener의 click을 직접하는 것과 같다. (재귀함수)
+                                sideBlank.click();
+
+
+                                // 재귀함수가 사람이 이해하기 쉽고 컴퓨터는 이해하기 어렵다 라고 평가를 받고
+                                // 오히려 반복문은 컴퓨터는 이해하기 쉽고 사람은 이해하기 어렵다 이런 평가를 받는다.
+                                // 그래서 복잡해질 수록 사람이 이해하기 쉽도록 재귀함수를 사용해야한다.
+                            }
+
+                            
                         });
 
                         // aroundBlanks.filter( (v) => !!v ).forEach(function(sideBlank){
@@ -206,7 +236,9 @@ document.querySelector('#execute').addEventListener('click', function(){
             td.textContent = '';
             tr.appendChild(td);
             
-            data.push(1);
+            data.push(0);
+            //data.push(1);
+            
 
         } // vertical for문
         
