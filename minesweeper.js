@@ -6,11 +6,16 @@ document.querySelector('#execute').addEventListener('click', function(){
 
     tbody.innerHTML = '';
 
+    // 테이블이 만들어진 상태에서 다시 실행을 하면 그 전에 있던 데이터가 남아 있어서
+    // 새로 만들어진 자리에 지뢰가 없음에도 클릭했을 때 지뢰가 있어서 dataset도 초기화 해야한다.
+    dataset = [];
+
     var horizontal = parseInt(document.querySelector('#horizontal').value);
     var vertical = parseInt(document.querySelector('#vertical').value);
     var mine = parseInt(document.querySelector('#mine').value);
 
-    console.log(horizontal, vertical, mine);
+    console.log(horizontal, vertical, mine); 
+
 
     // Create mine table.
     for(var i = 0; i < horizontal; i += 1) {
@@ -117,6 +122,9 @@ document.querySelector('#execute').addEventListener('click', function(){
                 var elementTd = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 var elementTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
 
+                // 원래는 테이블 색이 black 이지만 특정 td를 선택했을 때 Background Color를 white로 변경
+                e.currentTarget.classList.add('opened');
+
                 if(dataset[elementTr][elementTd] === 'X') {
                     e.currentTarget.textContent = '펑';
 
@@ -139,10 +147,57 @@ document.querySelector('#execute').addEventListener('click', function(){
                     }
 
                     // 필터는 return 조건이 true일 때 해당 요소 자체를 리턴한다.
-                     e.currentTarget.textContent = around.filter(function(e){
-                        return e === 'X';
+                     var aroundMineCount = around.filter(function(e){
+                        return e === 'X'; 
 
                     }).length;
+
+                    console.log('aroundMineCount: ', aroundMineCount);
+
+                    e.currentTarget.textContent = aroundMineCount;
+
+                    if( aroundMineCount === 0 ) {
+                        // 주변 8칸 동시 오픈(재귀 함수)
+
+                        var aroundBlanks = [];
+
+                        if(tbody.children[elementTr - 1]) {
+
+                            aroundBlanks = aroundBlanks.concat([
+                                tbody.children[elementTr - 1].children[elementTd - 1],
+                                tbody.children[elementTr - 1].children[elementTd],
+                                tbody.children[elementTr - 1].children[elementTd + 1],
+                            ]);
+                        }
+
+                        aroundBlanks = aroundBlanks.concat([
+                            tbody.children[elementTr].children[elementTd - 1],
+                            tbody.children[elementTr].children[elementTd + 1],
+                        ]);
+
+                        if(tbody.children[elementTr + 1]) {
+
+                            aroundBlanks = aroundBlanks.concat([
+                                tbody.children[elementTr + 1].children[elementTd - 1],
+                                tbody.children[elementTr + 1].children[elementTd],
+                                tbody.children[elementTr + 1].children[elementTd + 1] ,
+                            ]);
+                        }
+
+                        // 배열에서 "undefined, null, 0, 빈문자열" 의 값들이 있는 데이터를 삭제하는 함수이다.
+                        // 여기서는 element 한개를 가져오니 있다는 자체가 true이다. element가 없을 경우는 undefined 이다.
+                        aroundBlanks.filter( function(v) { console.log('v: ', v); return !!v } ).forEach(function(sideBlank){
+
+                            // 여기서 click() 함수는 addEventListener의 click을 직접하는 것과 같다. (재귀함수)
+                            sideBlank.click();
+                        });
+
+                        // aroundBlanks.filter( (v) => !!v ).forEach(function(sideBlank){
+                        //     sideBlank.click();
+                        // });
+                    }
+
+
                 }
 
             });
@@ -160,8 +215,6 @@ document.querySelector('#execute').addEventListener('click', function(){
     } // horizontal for문
 
     console.log('dataset: ', dataset);
-
-
 
 
     // Draw out mine location.
@@ -233,20 +286,20 @@ tbody.addEventListener('contextmenu', function(e){
 
 
 // 8-8. 스코프 체인 : 스코프 간의 상하관계를 스코프 체인이라고 부른다.
-var name = 'zero';
-function outer() {
-    console.log('외부', name); // 외부 zero
-    function inner() {
-        var enemy = 'nero';
-        console.log('내부', name);
-    }
-    inner();
-}
+// var name = 'zero';
+// function outer() {
+//     console.log('외부', name); // 외부 zero
+//     function inner() {
+//         var enemy = 'nero';
+//         console.log('내부', name);
+//     }
+//     inner();
+// }
 // inner() 함수 내부에 name이 없으면
 // 바깥으로 나가서 outer에서 찾는다.
 // outer에서도 없으면 outer 바깥의 전체범위에서 찾는다.
 
-outer();
+// outer();
 
 // enemy는 inner() 함수 내부에는 있지만 
 // 전체범위 내에서 함수 내에 있는 변수에는 접근할 수 없다.
@@ -255,18 +308,18 @@ outer();
 
 // 8-9. 렉시컬 스코프 : 정적 범위 변수나 함수가 정의된 뒤로 그 변수나 함수의 범위는 정적이고 변하지 않는다.
 // 동적 스코프인 경우는 최근에 할당 받은 변수를 호출하지만 정적 스코프는 그렇지 않다.
-var name = 'zero';
+// var name = 'zero';
 
-function log() {
-    console.log(name);
-}
+// function log() {
+//     console.log(name);
+// }
 
-function wrapper() {
-    var name = '비밀번호(바보)';
-    log();
-}
+// function wrapper() {
+//     var name = '비밀번호(바보)';
+//     log();
+// }
 
-wrapper();
+// wrapper();
 
 // 8-10. 클로저
 // for(var i = 0; i < 100; i++){ // 0.00000001초 만에 i는 100이 된다.
@@ -304,19 +357,31 @@ wrapper();
 
 
 // 즉시실행 함수를 사용해서 클로저 문제 해결
-for(var i = 0; i < 100; i++){
+// for(var i = 0; i < 100; i++){
 
 
-    (function closure(j){
+//     (function closure(j){
 
-        // 매개변수 j는 함수 내에서 변수를 선언한 것과 같은 의미이다.
-        // 예를 들어 var k = 0; 이라고 초기화했다면 
-        // 직접 초기화한 변수와 매개변수 j는 같은 스코프로 사용된다.
-        setTimeout(function(){
-            console.log('j: ', j);
-            console.log('j * 1000: ', j * 1000);
-        }, j * 1000);
+//         // 매개변수 j는 함수 내에서 변수를 선언한 것과 같은 의미이다.
+//         // 예를 들어 var k = 0; 이라고 초기화했다면 
+//         // 직접 초기화한 변수와 매개변수 j는 같은 스코프로 사용된다.
+//         setTimeout(function(){
+//             console.log('j: ', j);
+//             console.log('j * 1000: ', j * 1000);
+//         }, j * 1000);
 
-    })(i);
+//     })(i);
 
-}
+// }
+
+
+// function recursion(num){
+
+//     console.log('recursion num: ', num);
+
+//     if(num < 5)
+//         recursion(num + 1);
+    
+// }
+
+// recursion(1);
