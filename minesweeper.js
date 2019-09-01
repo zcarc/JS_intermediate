@@ -1,6 +1,14 @@
 var tbody = document.querySelector('#table tbody');
 var dataset = [];
 
+// 플래그는 코드의 흐름을 좌우하는 변수를 가르킨다.
+// 프로그램의 로직을 제어하는 변수이고 그걸 플래그 변수라고 한다.
+var stopFlag = false;
+
+// 칸을 클릭 할 때 마다 count를 증가시키고
+// count와 전체 칸과 mine의 값을 빼면 마인이 없는 칸수가 나오게 된다.
+// 그 값과 openedCount와 비교를 하면 된다.
+var openedCount = 0;
 
 document.querySelector('#execute').addEventListener('click', function(){
 
@@ -9,6 +17,12 @@ document.querySelector('#execute').addEventListener('click', function(){
     // 테이블이 만들어진 상태에서 다시 실행을 하면 그 전에 있던 데이터가 남아 있어서
     // 새로 만들어진 자리에 지뢰가 없음에도 클릭했을 때 지뢰가 있어서 dataset도 초기화 해야한다.
     dataset = [];
+
+
+    document.querySelector('#result').textContent = '';
+
+    stopFlag = false;
+    openedCount = 0;
 
     var horizontal = parseInt(document.querySelector('#horizontal').value);
     var vertical = parseInt(document.querySelector('#vertical').value);
@@ -32,6 +46,12 @@ document.querySelector('#execute').addEventListener('click', function(){
             //////////////////////////////////////////////////
             // td 오른쪽 클릭 시
             td.addEventListener('contextmenu',function(e){
+
+
+                if(stopFlag) {
+                    return;
+                }
+
                 //console.log('e: ', e);
 
 
@@ -117,19 +137,36 @@ document.querySelector('#execute').addEventListener('click', function(){
             // td 왼쪽 클릭 시
             td.addEventListener('click', function(e) {
 
+                console.log(stopFlag);
+
+                if(stopFlag) {
+                    return;
+                }
+
                 var parentTr = e.currentTarget.parentNode;
                 var parentTbody = parentTr.parentNode;
 
                 var elementTd = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 var elementTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+                
+
+                console.log('dataset[elementTr][elementTd]: ', dataset[elementTr][elementTd]);
+                console.log('openedCount: ', openedCount);
+
+                if(dataset[elementTr][elementTd] === 1) {
+                    return;
+                }
 
                 // 원래는 테이블 색이 black 이지만 특정 td를 선택했을 때 Background Color를 white로 변경
                 e.currentTarget.classList.add('opened');
+                openedCount += 1;
 
 
                 if(dataset[elementTr][elementTd] === 'X') {
 
                     e.currentTarget.textContent = '펑';
+                    document.querySelector('#result').textContent = '실패 ㅠㅠ';
+                    stopFlag = true;
 
                 } else {
 
@@ -161,7 +198,11 @@ document.querySelector('#execute').addEventListener('click', function(){
 
                     console.log('aroundMineCount: ', aroundMineCount);
 
-                    e.currentTarget.textContent = aroundMineCount;
+                    // 대입 연산자의 변수에 || 연산자가 포함되어 있다면
+                    // || 연산자 앞에 있는 변수가 false인 경우 || 뒤에 있는 값을 대입하라는 의미이다.
+                    // false가 되는 경우는 6가지가 있다.
+                    // 0, ''(빈문자열), NaN, null, undefined, false 이다.
+                    e.currentTarget.textContent = aroundMineCount || '';
 
                     if( aroundMineCount === 0 ) {
                         // 주변 8칸 동시 오픈(재귀 함수)
@@ -225,6 +266,12 @@ document.querySelector('#execute').addEventListener('click', function(){
                         // aroundBlanks.filter( (v) => !!v ).forEach(function(sideBlank){
                         //     sideBlank.click();
                         // });
+                    }
+
+                    if(openedCount === horizontal * vertical - mine) {
+                        
+                        stopFlag = true;
+                        document.querySelector('#result').textContent = '와아~ 승리했다!';
                     }
 
 
@@ -298,7 +345,8 @@ document.querySelector('#execute').addEventListener('click', function(){
 
 // addEventListener 를 단 대상과 실제로 eventListener가 발생하는 그 Target은 다를 수 있다.
 // eventListener를 단 대상이 currentTarget이고 이벤트가 실제로 발생하는 얘가 target이다.
-tbody.addEventListener('contextmenu', function(e){
+tbody.addEventListener('contextmenu', function(e) {
+
     console.log('e.currentTarget: ', e.currentTarget);
     console.log('e.target: ', e.target);
     
