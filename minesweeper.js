@@ -10,6 +10,18 @@ var stopFlag = false;
 // 그 값과 openedCount와 비교를 하면 된다.
 var openedCount = 0;
 
+
+var dictionary = {
+
+    openedBlank : -1,
+    quensionMark : -2,
+    flag : -3,
+    flagMine : -4,
+    quensionMarkMine : -5,
+    mine : 1,
+    normalBlank : 0
+}
+
 document.querySelector('#execute').addEventListener('click', function(){
 
     tbody.innerHTML = '';
@@ -40,6 +52,8 @@ document.querySelector('#execute').addEventListener('click', function(){
 
         for(var j  = 0; j < vertical; j += 1) {
 
+
+            data.push(dictionary.normalBlank);
 
             var td = document.createElement('td');
 
@@ -104,6 +118,15 @@ document.querySelector('#execute').addEventListener('click', function(){
 
                     e.currentTarget.textContent = '!';
 
+                    if(dataset[elementTr][elementTd] === dictionary.mine) {
+                        dataset[elementTr][elementTd] = dictionary.flagMine;
+
+                    } else {
+                        dataset[elementTr][elementTd] = dictionary.flag;
+                    }
+
+                    
+
                     // 데이터를 변경하지 않아도 되는 이유는 화면만 바꾸면 되기 때문이다.
                     // 원래 데이터는 그대로 유지된 채로 빈칸, !, ? X 만 보여주고
                     // 해당 데이터로 지뢰인지 아닌지 구분해야하기 때문에 
@@ -115,14 +138,26 @@ document.querySelector('#execute').addEventListener('click', function(){
                     e.currentTarget.textContent = '?';
                     //dataset[elementTd][elementTr] = '?';
 
+                    if(dataset[elementTr][elementTd] === dictionary.flagMine) {
+                        dataset[elementTr][elementTd] = dictionary.quensionMarkMine;
+
+                    } else {
+                        dataset[elementTr][elementTd] = dictionary.quensionMark;
+                    }
+
+
                 } else if (e.currentTarget.textContent === '?') {
 
-                    // 화면상에 '?' 인 경우 해당 그 자리에 지뢰가 있지 않은 경우
-                    if(dataset[elementTr][elementTd] === 1) {
-                        e.currentTarget.textContent = '';
 
-                    } else if(dataset[elementTr][elementTd] === 'X') {
+                    if( dataset[elementTr][elementTd] = dictionary.quensionMarkMine ) {
+                        
                         e.currentTarget.textContent = 'X';
+                        dataset[elementTr][elementTd] = dictionary.mine;
+
+                    } else{
+
+                        e.currentTarget.textContent = '';
+                        dataset[elementTr][elementTd] = dictionary.normalBlank;
                     }
 
                     //e.currentTarget.textContent = '';
@@ -153,7 +188,7 @@ document.querySelector('#execute').addEventListener('click', function(){
                 console.log('dataset[elementTr][elementTd]: ', dataset[elementTr][elementTd]);
                 console.log('openedCount: ', openedCount);
 
-                if(dataset[elementTr][elementTd] === 1) {
+                if( [dictionary.openedBlank, dictionary.flag, dictionary.flagMine, dictionary.quensionMarkMine, dictionary.quensionMark].includes(dataset[elementTr][elementTd]) ) {
                     return;
                 }
 
@@ -162,7 +197,7 @@ document.querySelector('#execute').addEventListener('click', function(){
                 openedCount += 1;
 
 
-                if(dataset[elementTr][elementTd] === 'X') {
+                if(dataset[elementTr][elementTd] === dictionary.mine) {
 
                     e.currentTarget.textContent = '펑';
                     document.querySelector('#result').textContent = '실패 ㅠㅠ';
@@ -172,7 +207,7 @@ document.querySelector('#execute').addEventListener('click', function(){
 
                     // 재귀함수 시 열었던 부분을 다시 여는 부분이 있기 때문에 성능저하 문제가 있다.
                     // 원래는 0이었다가 click 했을 때 1로 바꿈
-                    dataset[elementTr][elementTd] = 1;
+                    dataset[elementTr][elementTd] = dictionary.openedBlank;
 
                     var around = [
                         dataset[elementTr][elementTd - 1], dataset[elementTr][elementTd + 1],
@@ -192,7 +227,7 @@ document.querySelector('#execute').addEventListener('click', function(){
 
                     // 필터는 return 조건이 true일 때 해당 요소 자체를 리턴한다.
                      var aroundMineCount = around.filter(function(e){
-                        return e === 'X'; 
+                        return e === dictionary.mine; 
 
                     }).length;
 
@@ -234,8 +269,10 @@ document.querySelector('#execute').addEventListener('click', function(){
 
                         
 
-                        // 배열에서 "undefined, null, 0, 빈문자열" 의 값들이 있는 데이터를 삭제하는 함수이다.
+                        // 배열에서 "undefined, null, 0, 빈문자열" 의 값들이 있는 데이터를 걸러내는 함수이다.
                         // 여기서는 element 한개를 가져오니 있다는 자체가 true이다. element가 없을 경우는 undefined 이다.
+                        // !!v 이 의미는 해당 값을 boolean 형으로 변환해주는데 v가 false인 형태의 값이라면 해당 값은 반환되지 않는다.
+                        // 반면 v가 true인 경우에는 그 값은 반환된다.
                         aroundBlanks.filter( function(v) { 
                             console.log('v: ', v); 
                             return !!v;
@@ -247,7 +284,7 @@ document.querySelector('#execute').addEventListener('click', function(){
                             var sideBlankTd = Array.prototype.indexOf.call(parentTr.children, sideBlank);
                             var sideBlankTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
 
-                            if(dataset[sideBlankTr][sideBlankTd] !== 1){
+                            if(dataset[sideBlankTr][sideBlankTd] !== dictionary.openedBlank){
 
                                 console.log('클릭될 칸: ', sideBlank);
 
@@ -283,8 +320,6 @@ document.querySelector('#execute').addEventListener('click', function(){
             td.textContent = '';
             tr.appendChild(td);
             
-            data.push(0);
-            //data.push(1);
             
 
         } // vertical for문
@@ -335,7 +370,7 @@ document.querySelector('#execute').addEventListener('click', function(){
         //console.log('Math.floor(fisherYatesShuffle[k] / 10): ', horizontalLocation);
         //console.log('fisherYatesShuffle % 10: ', verticalLocation);
         tbody.children[horizontalLocation].children[verticalLocation].textContent = 'X';
-        dataset[horizontalLocation][verticalLocation] = 'X';
+        dataset[horizontalLocation][verticalLocation] = dictionary.mine;
     }
 
     //console.log('after Land mine dataset: ', dataset);
