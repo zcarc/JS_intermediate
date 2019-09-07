@@ -117,6 +117,7 @@ document.querySelector('#execute').addEventListener('click', function(){
                 if(e.currentTarget.textContent === '' || e.currentTarget.textContent === 'X') {
 
                     e.currentTarget.textContent = '!';
+                    e.currentTarget.classList.add('flag');
 
                     if(dataset[elementTr][elementTd] === dictionary.mine) {
                         dataset[elementTr][elementTd] = dictionary.flagMine;
@@ -136,7 +137,8 @@ document.querySelector('#execute').addEventListener('click', function(){
                 } else if (e.currentTarget.textContent === '!') {
 
                     e.currentTarget.textContent = '?';
-                    //dataset[elementTd][elementTr] = '?';
+                    e.currentTarget.classList.remove('flag');
+                    e.currentTarget.classList.add('question');
 
                     if(dataset[elementTr][elementTd] === dictionary.flagMine) {
                         dataset[elementTr][elementTd] = dictionary.quensionMarkMine;
@@ -148,6 +150,7 @@ document.querySelector('#execute').addEventListener('click', function(){
 
                 } else if (e.currentTarget.textContent === '?') {
 
+                    e.currentTarget.classList.remove('question');
 
                     if( dataset[elementTr][elementTd] = dictionary.quensionMarkMine ) {
                         
@@ -227,7 +230,9 @@ document.querySelector('#execute').addEventListener('click', function(){
 
                     // 필터는 return 조건이 true일 때 해당 요소 자체를 리턴한다.
                      var aroundMineCount = around.filter(function(e){
-                        return e === dictionary.mine; 
+
+                        // 주변 지뢰 개수를 셀 때 지뢰를 포함해서 느낌표 지뢰, 물음표 지뢰의 개수도 카운트
+                        return [dictionary.mine, dictionary.flagMine, dictionary.quensionMarkMine].includes(e); 
 
                     }).length;
 
@@ -342,7 +347,8 @@ document.querySelector('#execute').addEventListener('click', function(){
     // 피셔 예이츠 셔플 이라는 알고리즘이다.
     var fisherYatesShuffle = [];
     
-    while(candidate.length > 80) {
+    // 가로 세로 값이 바뀌었을 때 심을 마인의 수
+    while(candidate.length > horizontal * vertical - mine) {
         var math = Math.floor( Math.random() * candidate.length );
         //console.log('math: ', math);
         var value = candidate.splice( math , 1 )[0];
@@ -360,8 +366,8 @@ document.querySelector('#execute').addEventListener('click', function(){
         // 예를 들어 53이라면 
         // 5가 horizontalLocation
         // 3이 verticalLocation
-        var horizontalLocation =  Math.floor(fisherYatesShuffle[k] / 10);
-        var verticalLocation = fisherYatesShuffle[k] % 10;
+        var horizontalLocation =  Math.floor(fisherYatesShuffle[k] / vertical);
+        var verticalLocation = fisherYatesShuffle[k] % vertical;
 
         
 
